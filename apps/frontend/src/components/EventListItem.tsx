@@ -15,10 +15,10 @@ interface Props {
 
 function getEmail(event: WebhookEvent): string {
   try {
-    const data = event.payload.data as {
+    const payload = event.payload as {
       email_addresses?: Array<{ email_address: string }>
     }
-    return data.email_addresses?.[0]?.email_address ?? '(no email)'
+    return payload.email_addresses?.[0]?.email_address ?? '(no email)'
   } catch {
     return '(no email)'
   }

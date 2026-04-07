@@ -6,7 +6,7 @@ function IndexPage() {
 	return (
 		<div className="flex h-screen bg-gray-950 text-gray-100">
 			{/* Left column: Auth panel */}
-			<div className="w-72 flex-shrink-0 border-r border-gray-800 flex items-center justify-center p-4">
+			<div className="w-[1000px] flex-shrink-0 border-r border-gray-800 flex items-center justify-center p-4 overflow-auto">
 				<AuthPanel />
 			</div>
 
