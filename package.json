@@ -1,9 +1,5 @@
 {
   "name": "clerk-webhook",
   "private": true,
-  "version": "0.0.0",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ]
+  "version": "0.0.0"
 }
