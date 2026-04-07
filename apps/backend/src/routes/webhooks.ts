@@ -1,4 +1,9 @@
-import type { FastifyInstance } from "fastify";
+import type { ClerkWebhookEvent } from "@clerk-webhook/types";
+import type { FastifyInstance, FastifyRequest } from "fastify";
+import { randomUUID } from "node:crypto";
+import { Webhook } from "svix";
+import { insertEvent } from "../db/events.js";
+import { env } from "../env.js";
 
 export async function webhooksRoutes(fastify: FastifyInstance): Promise<void> {
 	// Register a raw body parser for this route so the body arrives as a string.
@@ -13,40 +18,42 @@ export async function webhooksRoutes(fastify: FastifyInstance): Promise<void> {
 		},
 	);
 
-	fastify.post("/webhooks/clerk", async (request, reply) => {
-		const rawBody = request.body as string;
-		}
+	fastify.post("/webhooks/clerk", async (request: FastifyRequest, reply) => {
+		const payload = request.body as string;
 
 		// TODO: Verify the Svix signature using verifyWebhook() from @clerk/backend
-		//
-		// import { verifyWebhook } from '@clerk/backend/webhooks'
-		//
-		// const secret = process.env.CLERK_WEBHOOK_SIGNING_SECRET
-		// if (!secret) throw new Error('CLERK_WEBHOOK_SIGNING_SECRET is not set')
-		//
-		// let event
-		// try {
-		//   event = await verifyWebhook(rawBody, {
-		//     'svix-id': request.headers['svix-id'] as string,
-		//     'svix-timestamp': request.headers['svix-timestamp'] as string,
-		//     'svix-signature': request.headers['svix-signature'] as string,
-		//   }, secret)
-		// } catch {
-		//   return reply.code(400).send({ error: 'Invalid signature' })
-		// }
+		const secret = env.CLERK_WEBHOOK_SIGNING_SECRET;
+		console.log("CLERK_WEBHOOK_SIGNING_SECRET", secret);
+		if (!secret) throw new Error("CLERK_WEBHOOK_SIGNING_SECRET is not set!");
 
-		// TODO: Extract event_type and svix_id, insert into DB
-		//
-		// import { insertEvent } from '../db/events.js'
-		// import { randomUUID } from 'node:crypto'
-		//
-		// await insertEvent({
-		//   id: randomUUID(),
-		//   svix_id: request.headers['svix-id'] as string,
-		//   event_type: event.type,
-		//   payload: JSON.stringify(event.data),
-		//   received_at: Date.now(),
-		// })
+		const svix_id = request.headers["svix-id"] as string;
+		const svix_timestamp = request.headers["svix-timestamp"] as string;
+		const svix_signature = request.headers["svix-signature"] as string;
+
+		if (!svix_id || !svix_timestamp || !svix_signature) {
+			throw new Error("Missing svix headers!");
+		}
+
+		try {
+			const webhook = new Webhook(secret);
+			const event = (await webhook.verify(payload, {
+				"svix-id": svix_id,
+				"svix-timestamp": svix_timestamp,
+				"svix-signature": svix_signature,
+			})) as ClerkWebhookEvent;
+
+			console.log("\n\n", event, "\n\n");
+
+			await insertEvent({
+				id: randomUUID(),
+				svix_id: request.headers["svix-id"] as string,
+				event_type: event.type,
+				payload: JSON.stringify(event.data),
+				received_at: Date.now(),
+			});
+		} catch {
+			return reply.code(400).send({ error: "Invalid signature" });
+		}
 
 		return reply.code(200).send({ received: true });
 	});
