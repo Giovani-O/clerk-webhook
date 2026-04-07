@@ -1,0 +1,1 @@
+{"root":["./src/main.tsx","./src/routeTree.gen.ts","./src/api/events.ts","./src/components/AuthPanel.tsx","./src/components/EventInspector.tsx","./src/components/EventList.tsx","./src/components/EventListItem.tsx","./src/components/PayloadInspector.tsx","./src/lib/shiki.ts","./src/lib/time.ts","./src/routes/__root.tsx","./src/routes/index.tsx"],"version":"5.9.3"}
