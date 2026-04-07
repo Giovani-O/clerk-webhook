@@ -3,3 +3,6 @@ dist/
 .env
 *.local
 .superpowers
+
+# Backend SQLite data directory
+apps/backend/data/
