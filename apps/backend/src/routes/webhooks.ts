@@ -7,9 +7,6 @@ import { env } from "../env.js";
 
 export async function webhooksRoutes(fastify: FastifyInstance): Promise<void> {
 	// Register a raw body parser for this route so the body arrives as a string.
-	// IMPORTANT: Do NOT use the default JSON parser here — Svix signature
-	// verification requires the byte-exact raw request body. Parsing it first
-	// corrupts the signature check.
 	fastify.addContentTypeParser(
 		"application/json",
 		{ parseAs: "string" },
@@ -21,7 +18,6 @@ export async function webhooksRoutes(fastify: FastifyInstance): Promise<void> {
 	fastify.post("/webhooks/clerk", async (request: FastifyRequest, reply) => {
 		const payload = request.body as string;
 
-		// TODO: Verify the Svix signature using verifyWebhook() from @clerk/backend
 		const secret = env.CLERK_WEBHOOK_SIGNING_SECRET;
 		console.log("CLERK_WEBHOOK_SIGNING_SECRET", secret);
 		if (!secret) throw new Error("CLERK_WEBHOOK_SIGNING_SECRET is not set!");
