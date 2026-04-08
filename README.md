@@ -2,7 +2,7 @@
 
 Projeto de demonstração do ciclo completo de um webhook: um evento ocorre no Clerk, uma requisição HTTP assinada é entregue ao backend, o payload é verificado e persistido, e o frontend exibe o resultado em tempo quase real.
 
-Feito como ferramenta de ensino para desenvolvedores que estão aprendendo como webhooks funcionam na prática.
+![clerk-webhook](https://github.com/user-attachments/assets/2ef3491d-4347-4b69-a91e-2e3d43f6d26a)
 
 ---
 
